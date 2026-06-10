@@ -1,0 +1,102 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DVLD_DataAccessLayer
+{
+    public static class Countries
+    {
+
+        public static int GetCountryID(string CountryName)
+        {
+            int CountryID = -1;
+
+            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            string query = $@"Select CountryID from Countries where CountryName = '{CountryName}'";
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                conn.Open();
+                object result = cmd.ExecuteScalar();
+                if (result != null)
+                {
+                    int.TryParse(result.ToString(), out CountryID);
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally { conn.Close(); }
+
+            return CountryID;
+        }
+
+        public static DataTable GetCountriesInfo()
+        {
+            DataTable dt = null;
+
+            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            string query = @"Select * from Countries";
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader != null)
+                {
+                    dt = new DataTable();
+                    dt.Load(reader);
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return dt;
+        }
+
+        public static DataTable GetCountriesNames()
+        {
+            DataTable dt = null;
+
+            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            string query = @"select CountryName from Countries;";
+            SqlCommand cmd = new SqlCommand(query, conn);
+
+            try
+            {
+                conn.Open();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader != null)
+                {
+                    dt = new DataTable();
+                    dt.Load(reader);
+                }
+                reader.Close();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
+            }
+            finally
+            {
+                conn.Close();
+            }
+
+            return dt;
+        }
+    }
+}
