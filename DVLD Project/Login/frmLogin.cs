@@ -47,18 +47,25 @@ namespace DVLD_Project.Login
                 return;
             }
 
-            if (cbRememberMe.Checked)
+            try
             {
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", tbUsername.Text);
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", tbPassword.Text);
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", true);
+                if (cbRememberMe.Checked)
+                {
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", tbUsername.Text);
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", tbPassword.Text);
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", true);
+                }
+                else
+                {
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", "");
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", "");
+                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false);
+                }
             }
-            else
+            catch(Exception ex)
             {
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", "");
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", "");
-                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false);
-            }
+                Console.WriteLine("Error: " + ex.Message);
+            }    
 
             User = clsUser.GetUser(tbUsername.Text, tbPassword.Text);
             this.DialogResult = DialogResult.OK;
@@ -67,13 +74,20 @@ namespace DVLD_Project.Login
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
-            bool? isRememberMeChecked = Convert.ToBoolean(Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false));
-
-            if(isRememberMeChecked == true)
+            try
             {
-                tbUsername.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", null).ToString() ?? "";
-                tbPassword.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "Password", null).ToString() ?? "";
-                cbRememberMe.Checked = true;
+                bool? isRememberMeChecked = Convert.ToBoolean(Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false));
+
+                if (isRememberMeChecked == true)
+                {
+                    tbUsername.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", null).ToString() ?? "";
+                    tbPassword.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "Password", null).ToString() ?? "";
+                    cbRememberMe.Checked = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.Message);
             }
         }
     }
