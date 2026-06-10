@@ -3,6 +3,7 @@ using System.IO;
 using System.Windows.Forms;
 using DVLD_BusinessLoginLayer;
 using DVLD_Project.Global_Classes;
+using Microsoft.Win32;
 
 namespace DVLD_Project.Login
 {
@@ -47,9 +48,17 @@ namespace DVLD_Project.Login
             }
 
             if (cbRememberMe.Checked)
-                File.WriteAllText(clsGlobal.DVLDUserRememberMeFilePath, $@"{tbUsername.Text}|0|{tbPassword.Text}");
+            {
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", tbUsername.Text);
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", tbPassword.Text);
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", true);
+            }
             else
-                File.WriteAllText(clsGlobal.DVLDUserRememberMeFilePath, "");
+            {
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", "");
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", "");
+                Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false);
+            }
 
             User = clsUser.GetUser(tbUsername.Text, tbPassword.Text);
             this.DialogResult = DialogResult.OK;
@@ -58,18 +67,12 @@ namespace DVLD_Project.Login
 
         private void frmLogin_Load(object sender, EventArgs e)
         {
-            if(!File.Exists(clsGlobal.DVLDUserRememberMeFilePath))
-                File.Create(clsGlobal.DVLDUserRememberMeFilePath).Close();
+            bool? isRememberMeChecked = Convert.ToBoolean(Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false));
 
-            string line = File.ReadAllText(clsGlobal.DVLDUserRememberMeFilePath);
-            if(line != "")
+            if(isRememberMeChecked == true)
             {
-                string[] parts = line.Split(new string[] { "|0|" }, StringSplitOptions.None);
-
-                string username = parts[0];
-                string password = parts[1];
-                tbUsername.Text = username;
-                tbPassword.Text = password;
+                tbUsername.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", null).ToString() ?? "";
+                tbPassword.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "Password", null).ToString() ?? "";
                 cbRememberMe.Checked = true;
             }
         }
