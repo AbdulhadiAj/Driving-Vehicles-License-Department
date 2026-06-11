@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
 using System.Net;
@@ -27,7 +28,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtPeople = new DataTable();
                     dtPeople.Load(reader);
@@ -36,7 +37,7 @@ namespace DVLD_DataAccessLayer
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -52,10 +53,21 @@ namespace DVLD_DataAccessLayer
             int PersonID = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into People values('{NationalNumber}', '{FirstName}', '{SecondName}', '{ThirdName}', '{LastName}', '{DateOfBirth}', {Gender}, '{Address}',
-                            '{Phone}', '{Email}', {NationalityCountryID}, @ImagePath);
+            string query = $@"Insert into People values(@NationalNumber, @FirstName, @SecondName, @ThirdName, @LastName, @DateOfBirth, @Gender, @Address,
+                            @Phone, @Email, @NationalityCountryID, @ImagePath);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NationalNumber", NationalNumber);
+            cmd.Parameters.AddWithValue("@FirstName", FirstName);
+            cmd.Parameters.AddWithValue("@SecondName", SecondName);
+            cmd.Parameters.AddWithValue("@ThirdName", ThirdName);
+            cmd.Parameters.AddWithValue("@LastName", LastName);
+            cmd.Parameters.AddWithValue("@DateOfBirth", DateOfBirth);
+            cmd.Parameters.AddWithValue("@Gender", Gender);
+            cmd.Parameters.AddWithValue("@Address", Address);
+            cmd.Parameters.AddWithValue("@Phone", Phone);
+            cmd.Parameters.AddWithValue("@Email", Email);
+            cmd.Parameters.AddWithValue("@NationalityCountryID", NationalityCountryID);
             if (ImagePath == "")
                 cmd.Parameters.AddWithValue("@ImagePath", DBNull.Value);
             else
@@ -64,14 +76,14 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if(result != null)
+                if(result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out PersonID);
                 }
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Error: " +  ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -86,21 +98,22 @@ namespace DVLD_DataAccessLayer
             bool isExist = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select found = 1 from People where NationalNo = '{NationalNo}'";
+            string query = $@"Select found = 1 from People where NationalNo = @NationalNo";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NationalNo", NationalNo);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     isExist = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -115,21 +128,22 @@ namespace DVLD_DataAccessLayer
             bool isExist = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select found = 1 from People where PersonID = {PersonID}";
+            string query = $@"Select found = 1 from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     isExist = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -151,14 +165,15 @@ namespace DVLD_DataAccessLayer
                             End
                             , People.DateOfBirth, Nationality = Countries.CountryName, People.Phone, People.Email, People.Address, People.ImagePath
                             from People inner join Countries on People.NationalityCountryID = Countries.CountryID
-                            where PersonID = {PersonID}";
+                            where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtPerson = new DataTable();
                     dtPerson.Load(reader);
@@ -173,7 +188,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -192,14 +207,15 @@ namespace DVLD_DataAccessLayer
                             End
                             , People.DateOfBirth, Nationality = Countries.CountryName, People.Phone, People.Email, People.Address, People.ImagePath
                             from People inner join Countries on People.NationalityCountryID = Countries.CountryID
-                            where NationalNo = '{NationalNo}'";
+                            where NationalNo = @NationalNo";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NationalNo", NationalNo);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtPerson = new DataTable();
                     dtPerson.Load(reader);
@@ -214,7 +230,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -227,14 +243,26 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update People set NationalNo = '{NationalNumber}', FirstName = '{FirstName}', SecondName = '{SecondName}', ThirdName = '{ThirdName}', LastName = '{LastName}', DateOfBirth = '{DateOfBirth}',
-                                                Gendor = {Gender}, Address = '{Address}', Phone = '{Phone}', Email = '{Email}', NationalityCountryID = {NationalityCountryID}, ImagePath = @ImagePath
-                              Where PersonID = {PersonID}";
+            string query = $@"Update People set NationalNo = @NationalNumber, FirstName = @FirstName, SecondName = @SecondName, ThirdName = @ThirdName, LastName = @LastName, DateOfBirth = @DateOfBirth,
+                                                Gendor = @Gender, Address = @Address, Phone = @Phone, Email = @Email, NationalityCountryID = @NationalityCountryID, ImagePath = @ImagePath
+                              Where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NationalNumber", NationalNumber);
+            cmd.Parameters.AddWithValue("@FirstName", FirstName);
+            cmd.Parameters.AddWithValue("@SecondName", SecondName);
+            cmd.Parameters.AddWithValue("@ThirdName", ThirdName);
+            cmd.Parameters.AddWithValue("@LastName", LastName);
+            cmd.Parameters.AddWithValue("@DateOfBirth", DateOfBirth);
+            cmd.Parameters.AddWithValue("@Gender", Gender);
+            cmd.Parameters.AddWithValue("@Address", Address);
+            cmd.Parameters.AddWithValue("@Phone", Phone);
+            cmd.Parameters.AddWithValue("@Email", Email);
+            cmd.Parameters.AddWithValue("@NationalityCountryID", NationalityCountryID);
             if (ImagePath == "")
                 cmd.Parameters.AddWithValue("@ImagePath", DBNull.Value);
             else
                 cmd.Parameters.AddWithValue("@ImagePath", ImagePath);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
@@ -247,7 +275,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -260,8 +288,9 @@ namespace DVLD_DataAccessLayer
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Delete from People
-                              Where PersonID = {PersonID}";
+                              Where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
@@ -274,7 +303,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -286,21 +315,22 @@ namespace DVLD_DataAccessLayer
             string imagePath = "";
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select ImagePath from People where PersonID = {PersonID}";
+            string query = $@"select ImagePath from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     imagePath = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -312,21 +342,22 @@ namespace DVLD_DataAccessLayer
             string name = "";
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select FullName = FirstName + ' ' + SecondName + ' ' + LastName from People where PersonID = {PersonID}";
+            string query = $@"select FullName = FirstName + ' ' + SecondName + ' ' + LastName from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     name = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -338,21 +369,22 @@ namespace DVLD_DataAccessLayer
             string n = "";
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select NationalNo from People where PersonID = {PersonID}";
+            string query = $@"select NationalNo from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     n = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

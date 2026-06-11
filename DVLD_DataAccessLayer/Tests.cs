@@ -16,21 +16,22 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select TestID from Tests where TestAppointmentID = {TestAppointmentID}";
+            string query = $@"select TestID from Tests where TestAppointmentID = @TestAppointmentID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -42,14 +43,15 @@ namespace DVLD_DataAccessLayer
             DataTable dt = null;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select * from Tests where TestID = {TestID}";
+            string query = $@"select * from Tests where TestID = @TestID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestID", TestID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -59,38 +61,41 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
             return dt;
         }
 
-        public static int AddTest(int TestAppointmentID, int TestResult, string Notes, int createdByUserID)
+        public static int AddTest(int TestAppointmentID, int TestResult, string Notes, int CreatedByUserID)
         {
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into Tests values({TestAppointmentID}, {TestResult}, @Notes, {createdByUserID});
+            string query = $@"Insert into Tests values(@TestAppointmentID, @TestResult, @Notes, @CreatedByUserID);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
+            cmd.Parameters.AddWithValue("@TestResult", TestResult);
             if (Notes != "" && Notes != null)
                 cmd.Parameters.AddWithValue("@Notes", Notes);
             else
                 cmd.Parameters.AddWithValue("@Notes", DBNull.Value);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -106,21 +111,23 @@ namespace DVLD_DataAccessLayer
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select Found = 1 from Tests Join TestAppointments on Tests.TestAppointmentID = TestAppointments.TestAppointmentID
-                              where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID} and TestTypeID = {TestTypeID} and TestResult = 1";
+                              where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID and TestTypeID = @TestTypeID and TestResult = 1";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
+            cmd.Parameters.AddWithValue("@TestTypeID", TestTypeID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     passed = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

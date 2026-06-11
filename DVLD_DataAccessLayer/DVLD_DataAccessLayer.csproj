@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="Applications.cs" />
     <Compile Include="ApplicationTypes.cs" />
+    <Compile Include="clsEventLogger.cs" />
     <Compile Include="Countries.cs" />
     <Compile Include="DetainedLicenses.cs" />
     <Compile Include="Drivers.cs" />

@@ -24,7 +24,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -33,7 +33,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -45,9 +45,13 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update TestTypes set TestTypeTitle = '{TestTypeTitle}', TestTypeDescription = '{TestTypeDesc}', TestTypeFees = {TestTypeFees}
-                              where TestTypeID = {TestTypeID}";
+            string query = $@"Update TestTypes set TestTypeTitle = @TestTypeTitle, TestTypeDescription = @TestTypeDescription, TestTypeFees = @TestTypeFees
+                              where TestTypeID = @TestTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestTypeTitle", TestTypeTitle);
+            cmd.Parameters.AddWithValue("@TestTypeDescription", TestTypeDesc);
+            cmd.Parameters.AddWithValue("@TestTypeFees", TestTypeFees);
+            cmd.Parameters.AddWithValue("@TestTypeID", TestTypeID);
 
             try
             {
@@ -60,7 +64,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -74,14 +78,15 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select TestTypeTitle, TestTypeDescription, TestTypeFees
                             from TestTypes
-                            where TestTypeID = {TestTypeID}";
+                            where TestTypeID = @TestTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestTypeID", TestTypeID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -90,7 +95,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -102,21 +107,22 @@ namespace DVLD_DataAccessLayer
             string title = "";
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select TestTypeTitle from TestTypes where TestTypeID = {TestTypeID}";
+            string query = $@"select TestTypeTitle from TestTypes where TestTypeID = @TestTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestTypeID", TestTypeID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     title = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -128,21 +134,22 @@ namespace DVLD_DataAccessLayer
             double fees = 0;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select TestTypeFees from TestTypes where TestTypeID = {TestTypeID}";
+            string query = $@"select TestTypeFees from TestTypes where TestTypeID = @TestTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@TestTypeID", TestTypeID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     double.TryParse(result.ToString(), out fees);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

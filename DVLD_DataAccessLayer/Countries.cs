@@ -16,21 +16,22 @@ namespace DVLD_DataAccessLayer
             int CountryID = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select CountryID from Countries where CountryName = '{CountryName}'";
+            string query = $@"Select CountryID from Countries where CountryName = @CountryName";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@CountryName", CountryName);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out CountryID);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -49,7 +50,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -58,7 +59,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -80,7 +81,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -89,7 +90,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {

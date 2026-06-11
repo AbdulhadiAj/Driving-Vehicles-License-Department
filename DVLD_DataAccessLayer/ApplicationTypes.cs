@@ -24,7 +24,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -33,7 +33,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -45,9 +45,12 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update ApplicationTypes set ApplicationTypeTitle = '{ApplicationTypeTitle}', ApplicationFees = {ApplicationTypeFees}
-                              where ApplicationTypeID = {ApplicationTypeID}";
+            string query = $@"Update ApplicationTypes set ApplicationTypeTitle = @ApplicationTypeTitle, ApplicationFees = @ApplicationFees
+                              where ApplicationTypeID = @ApplicationTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationTypeTitle", ApplicationTypeTitle);
+            cmd.Parameters.AddWithValue("@ApplicationFees", ApplicationTypeFees);
+            cmd.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
             try
             {
@@ -60,7 +63,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -74,14 +77,15 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select ApplicationTypeTitle, ApplicationFees
                             from ApplicationTypes
-                            where ApplicationTypeID = {ApplicationTypeID}";
+                            where ApplicationTypeID = @ApplicationTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtApplicationType = new DataTable();
                     dtApplicationType.Load(reader);
@@ -90,7 +94,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -102,21 +106,22 @@ namespace DVLD_DataAccessLayer
             double fees = 0;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select ApplicationFees from ApplicationTypes where ApplicationTypeID = {ApplicationTypeID}";
+            string query = $@"Select ApplicationFees from ApplicationTypes where ApplicationTypeID = @ApplicationTypeID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     double.TryParse(result.ToString(), out fees);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {

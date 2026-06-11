@@ -25,7 +25,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -34,7 +34,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -49,22 +49,24 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into LocalDrivingLicenseApplications values({ApplicationID}, {LicenseClassID});
+            string query = $@"Insert into LocalDrivingLicenseApplications values(@ApplicationID, @LicenseClassID);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+            cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -81,27 +83,24 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select *
                             from LocalDrivingLicenseApplications 
-                            where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+                            where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
-                    if (dt.Rows[0]["PassedTestCount"] == DBNull.Value)
-                        dt.Rows[0]["PassedTestCount"] = 0;
-                    if (dt.Rows[0]["Status"] == DBNull.Value)
-                        dt.Rows[0]["Status"] = "";
                 }
                 reader.Close();
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -113,9 +112,12 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update LocalDrivingLicenseApplications set ApplicationID = {ApplicationID}, LicenseClassID = {LicenseClassID}
-                              Where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+            string query = $@"Update LocalDrivingLicenseApplications set ApplicationID = @ApplicationID, LicenseClassID = @LicenseClassID
+                              Where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+            cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
@@ -128,7 +130,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -141,8 +143,9 @@ namespace DVLD_DataAccessLayer
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Delete from LocalDrivingLicenseApplications
-                              Where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+                              Where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
@@ -155,7 +158,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -167,21 +170,24 @@ namespace DVLD_DataAccessLayer
             bool has = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select found = 1 from LocalDrivingLicenseApplications_View Where NationalNo = '{NationalNumber}' and ClassName = '{ClassName}' and Status = 'New'";
+            string query = $@"select found = 1 from LocalDrivingLicenseApplications_View Where NationalNo = @NationalNumber and ClassName = @ClassName and Status = @Status";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@NationalNumber", NationalNumber);
+            cmd.Parameters.AddWithValue("@ClassName", ClassName);
+            cmd.Parameters.AddWithValue("@Status", "New");
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     has = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -193,21 +199,22 @@ namespace DVLD_DataAccessLayer
             int n = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select PassedTestCount from LocalDrivingLicenseApplications_View where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+            string query = $@"select PassedTestCount from LocalDrivingLicenseApplications_View where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out n);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -224,21 +231,22 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select LicenseClassID
                             from LocalDrivingLicenseApplications 
-                            where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+                            where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -252,21 +260,22 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select ApplicationID
                             from LocalDrivingLicenseApplications 
-                            where LocalDrivingLicenseApplicationID = {LocalDrivingLicenseApplicationID}";
+                            where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

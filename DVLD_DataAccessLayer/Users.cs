@@ -16,21 +16,22 @@ namespace DVLD_DataAccessLayer
             bool isFound = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select Found = 1 from Users where UserName = '{username}'";
+            string query = $@"Select Found = 1 from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@username", username);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if(result != null)
+                if(result != null && result != DBNull.Value)
                 {
                     isFound = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -46,21 +47,22 @@ namespace DVLD_DataAccessLayer
             bool isFound = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select Found = 1 from Users where PersonID = {PersonID}";
+            string query = $@"Select Found = 1 from Users where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     isFound = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -76,21 +78,22 @@ namespace DVLD_DataAccessLayer
             string password = "";
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select Password from Users where UserName = '{username}'";
+            string query = $@"Select Password from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@username", username);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     password = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -105,21 +108,22 @@ namespace DVLD_DataAccessLayer
             bool isActive = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select IsActive from Users where UserName = '{username}'";
+            string query = $@"Select IsActive from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@username", username);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     isActive = (bool)(result);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -142,7 +146,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtUsers = new DataTable();
                     dtUsers.Load(reader);
@@ -151,7 +155,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -166,22 +170,26 @@ namespace DVLD_DataAccessLayer
             int UserID = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into Users values({PersonID}, '{UserName}', '{Password}', {(IsActive ? 1 : 0)});
+            string query = $@"Insert into Users values(@PersonID, @UserName, @Password, @IsActive);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
+            cmd.Parameters.AddWithValue("@UserName", UserName);
+            cmd.Parameters.AddWithValue("@Password", Password);
+            cmd.Parameters.AddWithValue("@IsActive", IsActive ? 1 : 0);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out UserID);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally
             {
@@ -198,14 +206,15 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select PersonID, UserName, Password, IsActive
                             from Users
-                            where UserID = {UserID}";
+                            where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UserID", UserID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtUser = new DataTable();
                     dtUser.Load(reader);
@@ -214,7 +223,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -228,14 +237,16 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select UserID, PersonID, IsActive
                             from Users
-                            where UserName = '{UserName}' and Password = '{Password}'";
+                            where UserName = @UserName and Password = @Password";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UserName", UserName);
+            cmd.Parameters.AddWithValue("@Password", Password);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dtUser = new DataTable();
                     dtUser.Load(reader);
@@ -244,7 +255,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -258,21 +269,22 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select UserName
                             from Users
-                            where UserID = {UserID}";
+                            where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UserID", UserID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     username = result.ToString();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -286,21 +298,22 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select UserID
                             from Users
-                            where UserName = '{UserName}'";
+                            where UserName = @UserName";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UserName", UserName);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -312,9 +325,14 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update Users set PersonID = {PersonID}, UserName = '{UserName}', Password = '{Password}', IsActive = {(IsActive ? 1 : 0)}
-                              Where UserID = {UserID}";
+            string query = $@"Update Users set PersonID = @PersonID, UserName = @UserName, Password = @Password, IsActive = @IsActive
+                              Where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
+            cmd.Parameters.AddWithValue("@UserName", UserName);
+            cmd.Parameters.AddWithValue("@Password", Password);
+            cmd.Parameters.AddWithValue("@IsActive", IsActive ? 1 : 0);
+            cmd.Parameters.AddWithValue("@UserID", UserID);
 
             try
             {
@@ -327,7 +345,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -340,8 +358,9 @@ namespace DVLD_DataAccessLayer
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Delete from Users
-                              Where UserID = {UserID}";
+                              Where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@UserID", UserID);
 
             try
             {
@@ -354,7 +373,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

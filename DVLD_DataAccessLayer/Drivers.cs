@@ -16,22 +16,25 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into Drivers values ({PersonID}, {CreatedByUserID}, '{CreatedDate}')
+            string query = $@"Insert into Drivers values (@PersonID, @CreatedByUserID, @CreatedDate)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+            cmd.Parameters.AddWithValue("@CreatedDate", CreatedDate);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -43,14 +46,15 @@ namespace DVLD_DataAccessLayer
             DataTable dt = null;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select * from Drivers Where PersonID = {PersonID}";
+            string query = $@"Select * from Drivers Where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -58,7 +62,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -80,7 +84,7 @@ GROUP BY Drivers.DriverID, People.PersonID, People.NationalNo, People.FirstName,
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -88,7 +92,7 @@ GROUP BY Drivers.DriverID, People.PersonID, People.NationalNo, People.FirstName,
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

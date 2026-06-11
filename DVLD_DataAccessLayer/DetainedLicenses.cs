@@ -22,7 +22,7 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -30,7 +30,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -42,9 +42,14 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into DetainedLicenses values ({LicenseID}, '{DetainDate}', {FineFees}, {CreatedByUserID}, {Convert.ToInt16(IsReleased)}, @ReleaseDate, @ReleasedByUserID, @ReleaseApplicationID)
+            string query = $@"Insert into DetainedLicenses values (@LicenseID, @DetainDate, @FineFees, @CreatedByUserID, @IsReleased, @ReleaseDate, @ReleasedByUserID, @ReleaseApplicationID)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
+            cmd.Parameters.AddWithValue("@DetainDate", DetainDate);
+            cmd.Parameters.AddWithValue("@FineFees", FineFees);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+            cmd.Parameters.AddWithValue("@IsReleased", Convert.ToInt16(IsReleased));
             if(IsReleased)
             {
                 cmd.Parameters.AddWithValue("@ReleaseDate", ReleaseDate);
@@ -62,14 +67,14 @@ namespace DVLD_DataAccessLayer
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -81,11 +86,15 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update DetainedLicenses set LicenseID = {LicenseID}, DetainDate = '{DetainDate}', FineFees = {FineFees}, CreatedByUserID = {CreatedByUserID}, IsReleased = {Convert.ToInt16(IsReleased)}
+            string query = $@"Update DetainedLicenses set LicenseID = @LicenseID, DetainDate = @DetainDate, FineFees = @FineFees, CreatedByUserID = @CreatedByUserID, IsReleased = @IsReleased
 , ReleaseDate = @ReleaseDate, ReleasedByUserID = @ReleasedByUserID, ReleaseApplicationID = @ReleaseApplicationID
-                              Where DetainID = {DetainID}";
+                              Where DetainID = @DetainID";
             SqlCommand cmd = new SqlCommand(query, conn);
-
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
+            cmd.Parameters.AddWithValue("@DetainDate", DetainDate);
+            cmd.Parameters.AddWithValue("@FineFees", FineFees);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+            cmd.Parameters.AddWithValue("@IsReleased", Convert.ToInt16(IsReleased));
             if (IsReleased)
             {
                 cmd.Parameters.AddWithValue("@ReleaseDate", ReleaseDate);
@@ -98,6 +107,7 @@ namespace DVLD_DataAccessLayer
                 cmd.Parameters.AddWithValue("@ReleasedByUserID", DBNull.Value);
                 cmd.Parameters.AddWithValue("@ReleaseApplicationID", DBNull.Value);
             }
+            cmd.Parameters.AddWithValue("@DetainID", DetainID);
 
             try
             {
@@ -110,7 +120,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -122,14 +132,16 @@ namespace DVLD_DataAccessLayer
             DataTable dt = null;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select * from DetainedLicenses Where LicenseID = {LicenseID}";
+            string query = $@"Select * from DetainedLicenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -143,7 +155,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -155,21 +167,23 @@ namespace DVLD_DataAccessLayer
             bool isDetained = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select Found = 1 from DetainedLicenses where LicenseID = {LicenseID} and IsReleased = 0;";
+            string query = $@"Select Found = 1 from DetainedLicenses where LicenseID = @LicenseID and IsReleased = @IsReleased";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
+            cmd.Parameters.AddWithValue("@IsReleased", 0);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     isDetained = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

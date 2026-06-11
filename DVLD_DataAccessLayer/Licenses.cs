@@ -18,27 +18,36 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Insert into Licenses values ({ApplicationID}, {DriverID}, {LicenseClassID}, '{IssueDate}', '{ExpirationDate}', @Notes, {PaidFees}, {Convert.ToInt16(IsActive)}, {IssueReason}, {CreatedByUserID})
+            string query = $@"Insert into Licenses values (@ApplicationID, @DriverID, @LicenseClassID, @IssueDate, @ExpirationDate, @Notes, @PaidFees, @IsActive, @IssueReason, @CreatedByUserID)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
-            if(!string.IsNullOrWhiteSpace(Notes))
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+            cmd.Parameters.AddWithValue("@DriverID", DriverID);
+            cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+            cmd.Parameters.AddWithValue("@IssueDate", IssueDate);
+            cmd.Parameters.AddWithValue("@ExpirationDate", ExpirationDate);
+            if (!string.IsNullOrWhiteSpace(Notes))
                 cmd.Parameters.AddWithValue("@Notes", Notes);
             else
                 cmd.Parameters.AddWithValue("@Notes", DBNull.Value);
+            cmd.Parameters.AddWithValue("@PaidFees", PaidFees);
+            cmd.Parameters.AddWithValue("@IsActive", Convert.ToInt16(IsActive));
+            cmd.Parameters.AddWithValue("@IssueReason", IssueReason);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
 
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -50,10 +59,21 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update Licenses set ApplicationID = {ApplicationID}, DriverID = {DriverID}, LicenseClass = {LicenseClassID}, IssueDate = '{IssueDate}', ExpirationDate = '{ExpirationDate}', Notes = '{Notes}'
-, PaidFees = {PaidFees}, IsActive = {Convert.ToInt16(IsActive)}, IssueReason = {IssueReason}, CreatedByUserID = {CreatedByUserID}
-                              Where LicenseID = {LicenseID}";
+            string query = $@"Update Licenses set ApplicationID = @ApplicationID, DriverID = @DriverID, LicenseClass = @LicenseClassID, IssueDate = @IssueDate, ExpirationDate = @ExpirationDate, Notes = @Notes
+, PaidFees = @PaidFees, IsActive = @IsActive, IssueReason = @IssueReason, CreatedByUserID = @CreatedByUserID
+                              Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
+            cmd.Parameters.AddWithValue("@DriverID", DriverID);
+            cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
+            cmd.Parameters.AddWithValue("@IssueDate", IssueDate);
+            cmd.Parameters.AddWithValue("@ExpirationDate", ExpirationDate);
+            cmd.Parameters.AddWithValue("@Notes", Notes);
+            cmd.Parameters.AddWithValue("@PaidFees", PaidFees);
+            cmd.Parameters.AddWithValue("@IsActive", Convert.ToInt16(IsActive));
+            cmd.Parameters.AddWithValue("@IssueReason", IssueReason);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
@@ -66,7 +86,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -78,14 +98,15 @@ namespace DVLD_DataAccessLayer
             DataTable dt = null;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select * from Licenses Where LicenseID = {LicenseID}";
+            string query = $@"Select * from Licenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -95,7 +116,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -107,21 +128,22 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select LicenseID from Licenses Where ApplicationID = {ApplicationID}";
+            string query = $@"Select LicenseID from Licenses Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -133,21 +155,22 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select LicenseClass from Licenses Where LicenseID = {LicenseID}";
+            string query = $@"Select LicenseClass from Licenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -162,14 +185,15 @@ namespace DVLD_DataAccessLayer
             string query = $@"select LicenseID, ApplicationID, LicenseClasses.ClassName, IssueDate, ExpirationDate, IsActive
 from Licenses join LicenseClasses on Licenses.LicenseClass = LicenseClasses.LicenseClassID
 join Drivers on Licenses.DriverID = Drivers.DriverID
-where Drivers.PersonID = {PersonID}";
+where Drivers.PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -177,7 +201,7 @@ where Drivers.PersonID = {PersonID}";
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -189,21 +213,23 @@ where Drivers.PersonID = {PersonID}";
             bool has = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select Found = 1 from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID where PersonID = {PersonID} and LicenseClass = {LicenseClassID}";
+            string query = $@"select Found = 1 from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID where PersonID = @PersonID and LicenseClass = @LicenseClassID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@PersonID", PersonID);
+            cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
 
             try
             {
                 conn.Open();
-                object reader = cmd.ExecuteScalar();
-                if (reader != null)
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
                 {
                     has = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -215,21 +241,22 @@ where Drivers.PersonID = {PersonID}";
             bool isActive = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select Found = 1 from Licenses where LicenseID = {LicenseID} and IsActive = 1 and ExpirationDate > GETDATE()";
+            string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and IsActive = 1 and ExpirationDate > GETDATE()";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
-                object reader = cmd.ExecuteScalar();
-                if (reader != null)
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
                 {
                     isActive = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -241,21 +268,22 @@ where Drivers.PersonID = {PersonID}";
             bool isRenewed = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select Found = 1 from Licenses where LicenseID = {LicenseID} and IsActive = 1";
+            string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and IsActive = 1";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
-                object reader = cmd.ExecuteScalar();
-                if (reader != null)
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
                 {
                     isRenewed = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -267,21 +295,22 @@ where Drivers.PersonID = {PersonID}";
             bool isExpired = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select Found = 1 from Licenses where LicenseID = {LicenseID} and ExpirationDate < GETDATE()";
+            string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and ExpirationDate < GETDATE()";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
-                object reader = cmd.ExecuteScalar();
-                if (reader != null)
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
                 {
                     isExpired = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -293,21 +322,22 @@ where Drivers.PersonID = {PersonID}";
             bool isWillExpiresSoon = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select Found = 1 from Licenses where LicenseID = {LicenseID} and GETDATE() BETWEEN DATEADD(MONTH, -1, ExpirationDate) AND ExpirationDate";
+            string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and GETDATE() BETWEEN DATEADD(MONTH, -1, ExpirationDate) AND ExpirationDate";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
-                object reader = cmd.ExecuteScalar();
-                if (reader != null)
+                object result = cmd.ExecuteScalar();
+                if (result != null && result != DBNull.Value)
                 {
                     isWillExpiresSoon = true;
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -319,21 +349,22 @@ where Drivers.PersonID = {PersonID}";
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Select Drivers.PersonID from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID Where LicenseID = {LicenseID}";
+            string query = $@"Select Drivers.PersonID from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 

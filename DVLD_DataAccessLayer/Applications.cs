@@ -21,12 +21,20 @@ namespace DVLD_DataAccessLayer
                 using (SqlConnection conn = new SqlConnection(Settings.ConnectionString))
                 {
                     conn.Open();
-                    string query = $@"Insert into Applications values({ApplicantPersonID}, '{ApplicationDate}', {ApplicationTypeID}, {ApplicationStatus}, '{LastStatusDate}', {PaidFees}, {CreatedByUserID});
+                    string query = $@"Insert into Applications values(@ApplicantPersonID, @ApplicationDate, @ApplicationTypeID, @ApplicationStatus, @LastStatusDate, @PaidFees, @CreatedByUserID);
                             select SCOPE_IDENTITY();";
                     using (SqlCommand cmd = new SqlCommand(query, conn))
                     {
+                        cmd.Parameters.AddWithValue("@ApplicantPersonID", ApplicantPersonID);
+                        cmd.Parameters.AddWithValue("@ApplicationDate", ApplicationDate);
+                        cmd.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
+                        cmd.Parameters.AddWithValue("@ApplicationStatus", ApplicationStatus);
+                        cmd.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
+                        cmd.Parameters.AddWithValue("@PaidFees", PaidFees);
+                        cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+
                         object result = cmd.ExecuteScalar();
-                        if (result != null)
+                        if (result != null && result != DBNull.Value)
                         {
                             int.TryParse(result.ToString(), out id);
                         }
@@ -35,7 +43,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
 
             return id;
@@ -48,14 +56,15 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"select *
                             from Applications 
-                            where ApplicationID = {ApplicationID}";
+                            where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
                 conn.Open();
                 SqlDataReader reader = cmd.ExecuteReader();
-                if (reader != null)
+                if (reader.HasRows)
                 {
                     dt = new DataTable();
                     dt.Load(reader);
@@ -64,7 +73,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -77,10 +86,18 @@ namespace DVLD_DataAccessLayer
             bool isUpdated = false;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"Update Applications set ApplicantPersonID = {ApplicantPersonID}, ApplicationDate = '{ApplicationDate}', ApplicationTypeID = {ApplicationTypeID},  
-                              ApplicationStatus = {ApplicationStatus}, LastStatusDate = '{LastStatusDate}', PaidFees = {PaidFees}, CreatedByUserID = {CreatedByUserID}
-                              Where ApplicationID = {ApplicationID}";
+            string query = $@"Update Applications set ApplicantPersonID = @ApplicantPersonID, ApplicationDate = @ApplicationDate, ApplicationTypeID = @ApplicationTypeID,  
+                              ApplicationStatus = @ApplicationStatus, LastStatusDate = @LastStatusDate, PaidFees = @PaidFees, CreatedByUserID = @CreatedByUserID
+                              Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicantPersonID", ApplicantPersonID);
+            cmd.Parameters.AddWithValue("@ApplicationDate", ApplicationDate);
+            cmd.Parameters.AddWithValue("@ApplicationTypeID", ApplicationTypeID);
+            cmd.Parameters.AddWithValue("@ApplicationStatus", ApplicationStatus);
+            cmd.Parameters.AddWithValue("@LastStatusDate", LastStatusDate);
+            cmd.Parameters.AddWithValue("@PaidFees", PaidFees);
+            cmd.Parameters.AddWithValue("@CreatedByUserID", CreatedByUserID);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
@@ -93,7 +110,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -106,8 +123,9 @@ namespace DVLD_DataAccessLayer
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Delete from Applications
-                              Where ApplicationID = {ApplicationID}";
+                              Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
@@ -120,7 +138,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -134,8 +152,9 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Update Applications
                               Set ApplicationStatus = 2, LastStatusDate = GETDATE()
-                              Where ApplicationID = {ApplicationID}";
+                              Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
@@ -148,7 +167,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -162,8 +181,9 @@ namespace DVLD_DataAccessLayer
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
             string query = $@"Update Applications
                               Set ApplicationStatus = 3, LastStatusDate = GETDATE()
-                              Where ApplicationID = {ApplicationID}";
+                              Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
@@ -176,7 +196,7 @@ namespace DVLD_DataAccessLayer
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
@@ -188,21 +208,22 @@ namespace DVLD_DataAccessLayer
             int id = -1;
 
             SqlConnection conn = new SqlConnection(Settings.ConnectionString);
-            string query = $@"select ApplicantPersonID from Applications where ApplicationID = {ApplicationID}";
+            string query = $@"select ApplicantPersonID from Applications where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
+            cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
 
             try
             {
                 conn.Open();
                 object result = cmd.ExecuteScalar();
-                if (result != null)
+                if (result != null && result != DBNull.Value)
                 {
                     int.TryParse(result.ToString(), out id);
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
             finally { conn.Close(); }
 
