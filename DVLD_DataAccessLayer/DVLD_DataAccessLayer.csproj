@@ -32,6 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
@@ -43,7 +44,7 @@
   <ItemGroup>
     <Compile Include="Applications.cs" />
     <Compile Include="ApplicationTypes.cs" />
-    <Compile Include="clsEventLogger.cs" />
+    <Compile Include="Global Classes\clsEventLogger.cs" />
     <Compile Include="Countries.cs" />
     <Compile Include="DetainedLicenses.cs" />
     <Compile Include="Drivers.cs" />
@@ -53,11 +54,13 @@
     <Compile Include="LocalDrivingLicenseApplications.cs" />
     <Compile Include="People.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Settings.cs" />
     <Compile Include="TestAppointments.cs" />
     <Compile Include="Tests.cs" />
     <Compile Include="TestTypes.cs" />
     <Compile Include="Users.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
