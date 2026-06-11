@@ -1,11 +1,12 @@
 ﻿using System.Diagnostics;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
     public static class clsEventLogger
     {
 
-        public static string SourceName = "DVLD-Application-DataAccessLayer";
+        public static string SourceName = ConfigurationManager.AppSettings["EventViewerSourceName"];
 
         public static void LogError(string message)
         {
