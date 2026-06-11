@@ -10,7 +10,7 @@ namespace DVLD_DataAccessLayer
     public static class clsEventLogger
     {
 
-        public static string SourceName = "DVLD-Application-DataAccessLayer";
+        public static string SourceName = "DVLD-Application-PresentationLayer";
 
         public static void LogError(string message)
         {

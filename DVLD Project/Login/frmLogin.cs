@@ -2,6 +2,7 @@
 using System.IO;
 using System.Windows.Forms;
 using DVLD_BusinessLoginLayer;
+using DVLD_DataAccessLayer;
 using DVLD_Project.Global_Classes;
 using Microsoft.Win32;
 
@@ -64,7 +65,7 @@ namespace DVLD_Project.Login
             }
             catch(Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }    
 
             User = clsUser.GetUser(tbUsername.Text, tbPassword.Text);
@@ -87,7 +88,7 @@ namespace DVLD_Project.Login
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Error: " + ex.Message);
+                clsEventLogger.LogError(ex.Message);
             }
         }
     }
