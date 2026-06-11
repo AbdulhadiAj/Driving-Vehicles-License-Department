@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -15,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select TestID from Tests where TestAppointmentID = @TestAppointmentID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@TestAppointmentID", TestAppointmentID);
@@ -42,7 +39,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select * from Tests where TestID = @TestID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@TestID", TestID);
@@ -72,7 +69,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into Tests values(@TestAppointmentID, @TestResult, @Notes, @CreatedByUserID);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -109,7 +106,7 @@ namespace DVLD_DataAccessLayer
         {
             bool passed = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Tests Join TestAppointments on Tests.TestAppointmentID = TestAppointments.TestAppointmentID
                               where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID and TestTypeID = @TestTypeID and TestResult = 1";
             SqlCommand cmd = new SqlCommand(query, conn);

@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -15,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isFound = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select Found = 1 from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@username", username);
@@ -46,7 +43,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isFound = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select Found = 1 from Users where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -77,7 +74,7 @@ namespace DVLD_DataAccessLayer
         {
             string password = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select Password from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@username", username);
@@ -107,7 +104,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isActive = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select IsActive from Users where UserName = @username";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@username", username);
@@ -138,7 +135,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtUsers = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"select * from Users;";
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -169,7 +166,7 @@ namespace DVLD_DataAccessLayer
         {
             int UserID = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into Users values(@PersonID, @UserName, @Password, @IsActive);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -203,7 +200,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtUser = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select PersonID, UserName, Password, IsActive
                             from Users
                             where UserID = @UserID";
@@ -234,7 +231,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtUser = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select UserID, PersonID, IsActive
                             from Users
                             where UserName = @UserName and Password = @Password";
@@ -266,7 +263,7 @@ namespace DVLD_DataAccessLayer
         {
             string username = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select UserName
                             from Users
                             where UserID = @UserID";
@@ -295,7 +292,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select UserID
                             from Users
                             where UserName = @UserName";
@@ -324,7 +321,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update Users set PersonID = @PersonID, UserName = @UserName, Password = @Password, IsActive = @IsActive
                               Where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -356,7 +353,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isDeleted = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Delete from Users
                               Where UserID = @UserID";
             SqlCommand cmd = new SqlCommand(query, conn);

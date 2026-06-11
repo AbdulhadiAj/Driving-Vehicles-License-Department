@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -15,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             int CountryID = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select CountryID from Countries where CountryName = @CountryName";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@CountryName", CountryName);
@@ -42,7 +39,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"Select * from Countries";
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -73,7 +70,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"select CountryName from Countries;";
             SqlCommand cmd = new SqlCommand(query, conn);
 

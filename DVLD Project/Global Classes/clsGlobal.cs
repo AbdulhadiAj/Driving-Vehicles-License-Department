@@ -11,9 +11,5 @@ namespace DVLD_Project.Global_Classes
     {
 
         public static clsUser CurrentUser { get; set; }
-
-        public static string DVLDPeopleImagesPath = @"C:\DVLD People Images\";
-
-        public static string UserRememberMeRegistryPath = @"HKEY_CURRENT_USER\Software\DVLD";
     }
 }

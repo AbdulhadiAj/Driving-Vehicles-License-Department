@@ -1,9 +1,7 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Net;
-using System.Security.Policy;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -14,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtPeople = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"select People.PersonID, People.NationalNo, People.FirstName, People.SecondName, People.ThirdName, People.LastName, Gender = 
                             Case
                             	when People.Gendor = 0 then 'Male'
@@ -52,7 +50,7 @@ namespace DVLD_DataAccessLayer
         {
             int PersonID = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into People values(@NationalNumber, @FirstName, @SecondName, @ThirdName, @LastName, @DateOfBirth, @Gender, @Address,
                             @Phone, @Email, @NationalityCountryID, @ImagePath);
                             select SCOPE_IDENTITY();";
@@ -97,7 +95,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isExist = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select found = 1 from People where NationalNo = @NationalNo";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@NationalNo", NationalNo);
@@ -127,7 +125,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isExist = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select found = 1 from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -157,7 +155,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtPerson = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select People.PersonID, People.NationalNo, People.FirstName, People.SecondName, People.ThirdName, People.LastName, Gender = 
                             Case
                             	when People.Gendor = 0 then 'Male'
@@ -199,7 +197,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dtPerson = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select People.PersonID, People.NationalNo, People.FirstName, People.SecondName, People.ThirdName, People.LastName, Gender = 
                             Case
                             	when People.Gendor = 0 then 'Male'
@@ -242,7 +240,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update People set NationalNo = @NationalNumber, FirstName = @FirstName, SecondName = @SecondName, ThirdName = @ThirdName, LastName = @LastName, DateOfBirth = @DateOfBirth,
                                                 Gendor = @Gender, Address = @Address, Phone = @Phone, Email = @Email, NationalityCountryID = @NationalityCountryID, ImagePath = @ImagePath
                               Where PersonID = @PersonID";
@@ -286,7 +284,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isDeleted = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Delete from People
                               Where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -314,7 +312,7 @@ namespace DVLD_DataAccessLayer
         {
             string imagePath = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select ImagePath from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -341,7 +339,7 @@ namespace DVLD_DataAccessLayer
         {
             string name = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select FullName = FirstName + ' ' + SecondName + ' ' + LastName from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -368,7 +366,7 @@ namespace DVLD_DataAccessLayer
         {
             string n = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select NationalNo from People where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);

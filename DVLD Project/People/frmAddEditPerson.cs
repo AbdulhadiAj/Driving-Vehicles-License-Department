@@ -7,6 +7,7 @@ using System.Data;
 using System.Drawing;
 using System.IO;
 using System.Windows.Forms;
+using System.Configuration;
 
 namespace DVLD_Project.People
 {
@@ -137,7 +138,7 @@ namespace DVLD_Project.People
             }
             else if (_person.ImagePath == "" && pbPersonalImage.ImageLocation != "")
             {
-                _person.ImagePath = clsGlobal.DVLDPeopleImagesPath + clsUtil.RenameFileUsingGUID(pbPersonalImage.ImageLocation);
+                _person.ImagePath = ConfigurationManager.AppSettings["DVLDPeopleImagesPath"] + clsUtil.RenameFileUsingGUID(pbPersonalImage.ImageLocation);
                 File.Copy(pbPersonalImage.ImageLocation, _person.ImagePath);
             }
             else if (_person.ImagePath != "" && pbPersonalImage.ImageLocation == "")
@@ -150,7 +151,7 @@ namespace DVLD_Project.People
                 if(pbPersonalImage.ImageLocation != _person.ImagePath)
                 {
                     File.Delete(_person.ImagePath);
-                    _person.ImagePath = clsGlobal.DVLDPeopleImagesPath + clsUtil.RenameFileUsingGUID(pbPersonalImage.ImageLocation);
+                    _person.ImagePath = ConfigurationManager.AppSettings["DVLDPeopleImagesPath"] + clsUtil.RenameFileUsingGUID(pbPersonalImage.ImageLocation);
                     File.Copy(pbPersonalImage.ImageLocation, _person.ImagePath);
                 }
             }

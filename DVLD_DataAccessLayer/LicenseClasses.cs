@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -15,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"select ClassName
                             from LicenseClasses";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -47,7 +44,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select LicenseClassID from LicenseClasses where ClassName = @LicenseClassName";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseClassName", LicenseClassName);
@@ -77,7 +74,7 @@ namespace DVLD_DataAccessLayer
         {
             string name = "";
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select ClassName from LicenseClasses where LicenseClassID = @LicenseClassID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
@@ -107,7 +104,7 @@ namespace DVLD_DataAccessLayer
         {
             int length = 0;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select DefaultValidityLength from LicenseClasses where LicenseClassID = @LicenseClassID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);
@@ -137,7 +134,7 @@ namespace DVLD_DataAccessLayer
         {
             double fees = 0;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select ClassFees from LicenseClasses where LicenseClassID = @LicenseClassID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseClassID", LicenseClassID);

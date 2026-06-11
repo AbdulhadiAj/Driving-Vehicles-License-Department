@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -14,7 +11,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select * from DetainedLicenses_View";
             SqlCommand cmd = new SqlCommand(query, conn);
 
@@ -41,7 +38,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into DetainedLicenses values (@LicenseID, @DetainDate, @FineFees, @CreatedByUserID, @IsReleased, @ReleaseDate, @ReleasedByUserID, @ReleaseApplicationID)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -85,7 +82,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update DetainedLicenses set LicenseID = @LicenseID, DetainDate = @DetainDate, FineFees = @FineFees, CreatedByUserID = @CreatedByUserID, IsReleased = @IsReleased
 , ReleaseDate = @ReleaseDate, ReleasedByUserID = @ReleasedByUserID, ReleaseApplicationID = @ReleaseApplicationID
                               Where DetainID = @DetainID";
@@ -131,7 +128,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select * from DetainedLicenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -166,7 +163,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isDetained = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select Found = 1 from DetainedLicenses where LicenseID = @LicenseID and IsReleased = @IsReleased";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);

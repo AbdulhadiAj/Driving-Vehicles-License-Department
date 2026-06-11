@@ -1,12 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -17,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into Licenses values (@ApplicationID, @DriverID, @LicenseClassID, @IssueDate, @ExpirationDate, @Notes, @PaidFees, @IsActive, @IssueReason, @CreatedByUserID)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -58,7 +53,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update Licenses set ApplicationID = @ApplicationID, DriverID = @DriverID, LicenseClass = @LicenseClassID, IssueDate = @IssueDate, ExpirationDate = @ExpirationDate, Notes = @Notes
 , PaidFees = @PaidFees, IsActive = @IsActive, IssueReason = @IssueReason, CreatedByUserID = @CreatedByUserID
                               Where LicenseID = @LicenseID";
@@ -97,7 +92,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select * from Licenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -127,7 +122,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select LicenseID from Licenses Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
@@ -154,7 +149,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select LicenseClass from Licenses Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -181,7 +176,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select LicenseID, ApplicationID, LicenseClasses.ClassName, IssueDate, ExpirationDate, IsActive
 from Licenses join LicenseClasses on Licenses.LicenseClass = LicenseClasses.LicenseClassID
 join Drivers on Licenses.DriverID = Drivers.DriverID
@@ -212,7 +207,7 @@ where Drivers.PersonID = @PersonID";
         {
             bool has = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID where PersonID = @PersonID and LicenseClass = @LicenseClassID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -240,7 +235,7 @@ where Drivers.PersonID = @PersonID";
         {
             bool isActive = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and IsActive = 1 and ExpirationDate > GETDATE()";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -267,7 +262,7 @@ where Drivers.PersonID = @PersonID";
         {
             bool isRenewed = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and IsActive = 1";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -294,7 +289,7 @@ where Drivers.PersonID = @PersonID";
         {
             bool isExpired = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and ExpirationDate < GETDATE()";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -321,7 +316,7 @@ where Drivers.PersonID = @PersonID";
         {
             bool isWillExpiresSoon = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select Found = 1 from Licenses where LicenseID = @LicenseID and GETDATE() BETWEEN DATEADD(MONTH, -1, ExpirationDate) AND ExpirationDate";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);
@@ -348,7 +343,7 @@ where Drivers.PersonID = @PersonID";
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select Drivers.PersonID from Licenses join Drivers on Licenses.DriverID = Drivers.DriverID Where LicenseID = @LicenseID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LicenseID", LicenseID);

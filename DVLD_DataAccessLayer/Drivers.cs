@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -15,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into Drivers values (@PersonID, @CreatedByUserID, @CreatedDate)
                               Select Scope_Identity()";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -45,7 +42,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Select * from Drivers Where PersonID = @PersonID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@PersonID", PersonID);
@@ -73,7 +70,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"SELECT Drivers.DriverID, People.PersonID, People.NationalNo, FullName = People.FirstName + ' ' + People.SecondName + ' ' + People.LastName,
 Drivers.CreatedDate, COUNT(*) AS ActiveLicenses FROM Drivers JOIN People ON Drivers.PersonID = People.PersonID
 JOIN Licenses ON Licenses.DriverID = Drivers.DriverID WHERE Licenses.IsActive = 1

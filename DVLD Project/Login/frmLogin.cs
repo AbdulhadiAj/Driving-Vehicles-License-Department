@@ -5,6 +5,7 @@ using DVLD_BusinessLoginLayer;
 using DVLD_DataAccessLayer;
 using DVLD_Project.Global_Classes;
 using Microsoft.Win32;
+using System.Configuration;
 
 namespace DVLD_Project.Login
 {
@@ -52,15 +53,15 @@ namespace DVLD_Project.Login
             {
                 if (cbRememberMe.Checked)
                 {
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", tbUsername.Text);
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", tbPassword.Text);
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", true);
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "UserName", tbUsername.Text);
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "Password", tbPassword.Text);
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "IsRemeberMeChecked", true);
                 }
                 else
                 {
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", "");
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "Password", "");
-                    Registry.SetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false);
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "UserName", "");
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "Password", "");
+                    Registry.SetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "IsRemeberMeChecked", false);
                 }
             }
             catch(Exception ex)
@@ -77,12 +78,12 @@ namespace DVLD_Project.Login
         {
             try
             {
-                bool? isRememberMeChecked = Convert.ToBoolean(Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "IsRemeberMeChecked", false));
+                bool? isRememberMeChecked = Convert.ToBoolean(Registry.GetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "IsRemeberMeChecked", false));
 
                 if (isRememberMeChecked == true)
                 {
-                    tbUsername.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "UserName", null).ToString() ?? "";
-                    tbPassword.Text = Registry.GetValue(clsGlobal.UserRememberMeRegistryPath, "Password", null).ToString() ?? "";
+                    tbUsername.Text = Registry.GetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "UserName", null).ToString() ?? "";
+                    tbPassword.Text = Registry.GetValue(ConfigurationManager.AppSettings["UserRememberMeRegistryPath"], "Password", null).ToString() ?? "";
                     cbRememberMe.Checked = true;
                 }
             }

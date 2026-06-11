@@ -1,11 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -16,7 +12,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = @"select *
                             from LocalDrivingLicenseApplications_View";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -48,7 +44,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Insert into LocalDrivingLicenseApplications values(@ApplicationID, @LicenseClassID);
                             select SCOPE_IDENTITY();";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -80,7 +76,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select *
                             from LocalDrivingLicenseApplications 
                             where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
@@ -111,7 +107,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update LocalDrivingLicenseApplications set ApplicationID = @ApplicationID, LicenseClassID = @LicenseClassID
                               Where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -141,7 +137,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isDeleted = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Delete from LocalDrivingLicenseApplications
                               Where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -169,7 +165,7 @@ namespace DVLD_DataAccessLayer
         {
             bool has = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select found = 1 from LocalDrivingLicenseApplications_View Where NationalNo = @NationalNumber and ClassName = @ClassName and Status = @Status";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@NationalNumber", NationalNumber);
@@ -198,7 +194,7 @@ namespace DVLD_DataAccessLayer
         {
             int n = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select PassedTestCount from LocalDrivingLicenseApplications_View where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@LocalDrivingLicenseApplicationID", LocalDrivingLicenseApplicationID);
@@ -228,7 +224,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select LicenseClassID
                             from LocalDrivingLicenseApplications 
                             where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
@@ -257,7 +253,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select ApplicationID
                             from LocalDrivingLicenseApplications 
                             where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";

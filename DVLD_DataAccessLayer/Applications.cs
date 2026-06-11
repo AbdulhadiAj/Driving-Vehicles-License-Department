@@ -1,10 +1,7 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Configuration;
 
 namespace DVLD_DataAccessLayer
 {
@@ -18,7 +15,7 @@ namespace DVLD_DataAccessLayer
 
             try
             {
-                using (SqlConnection conn = new SqlConnection(Settings.ConnectionString))
+                using (SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]))
                 {
                     conn.Open();
                     string query = $@"Insert into Applications values(@ApplicantPersonID, @ApplicationDate, @ApplicationTypeID, @ApplicationStatus, @LastStatusDate, @PaidFees, @CreatedByUserID);
@@ -53,7 +50,7 @@ namespace DVLD_DataAccessLayer
         {
             DataTable dt = null;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select *
                             from Applications 
                             where ApplicationID = @ApplicationID";
@@ -85,7 +82,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isUpdated = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update Applications set ApplicantPersonID = @ApplicantPersonID, ApplicationDate = @ApplicationDate, ApplicationTypeID = @ApplicationTypeID,  
                               ApplicationStatus = @ApplicationStatus, LastStatusDate = @LastStatusDate, PaidFees = @PaidFees, CreatedByUserID = @CreatedByUserID
                               Where ApplicationID = @ApplicationID";
@@ -121,7 +118,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isDeleted = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Delete from Applications
                               Where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
@@ -149,7 +146,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isCanceled = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update Applications
                               Set ApplicationStatus = 2, LastStatusDate = GETDATE()
                               Where ApplicationID = @ApplicationID";
@@ -178,7 +175,7 @@ namespace DVLD_DataAccessLayer
         {
             bool isCompleted = false;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"Update Applications
                               Set ApplicationStatus = 3, LastStatusDate = GETDATE()
                               Where ApplicationID = @ApplicationID";
@@ -207,7 +204,7 @@ namespace DVLD_DataAccessLayer
         {
             int id = -1;
 
-            SqlConnection conn = new SqlConnection(Settings.ConnectionString);
+            SqlConnection conn = new SqlConnection(ConfigurationManager.AppSettings["DBConnectionString"]);
             string query = $@"select ApplicantPersonID from Applications where ApplicationID = @ApplicationID";
             SqlCommand cmd = new SqlCommand(query, conn);
             cmd.Parameters.AddWithValue("@ApplicationID", ApplicationID);
