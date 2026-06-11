@@ -49,21 +49,5 @@ namespace DVLD_Project.People.Controls
             InitializeComponent();
             _person = new clsPerson();
         }
-
-        private void ctrlPersonCard_Load(object sender, EventArgs e)
-        {
-            lblPersonID.Text = "???";
-            lblNationalNumber.Text = "???";
-            lblFirstName.Text = "???";
-            lblSecondName.Text = "???";
-            lblThirdName.Text = "???";
-            lblLastName.Text = "???";
-            lblDateOfBirth.Text = "???";
-            lblGender.Text = "???";
-            lblCountry.Text = "???";
-            lblPhone.Text = "???";
-            lblEmail.Text = "???";
-            lblAddress.Text = "???";
-        }
     }
 }
