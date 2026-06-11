@@ -59,8 +59,5 @@
     <Compile Include="TestTypes.cs" />
     <Compile Include="Users.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
