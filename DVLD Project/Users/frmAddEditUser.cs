@@ -9,6 +9,8 @@ using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.Security.Cryptography;
+using DVLD_Project.Global_Classes;
 
 namespace DVLD_Project.Users
 {
@@ -39,8 +41,8 @@ namespace DVLD_Project.Users
             ctrlPersonCardWithFilter1.PersonID = _user.Person.PersonID;
             lblUserID.Text = _user.UserId.ToString();
             tbUserName.Text = _user.UserName.ToString();
-            tbPassword.Text = _user.Password.ToString();
-            tbConfirmPassword.Text = _user.Password.ToString();
+            tbPassword.Enabled = false;
+            tbConfirmPassword.Enabled = false;
             cbIsActive.Checked = _user.IsActive;
         }
 
@@ -127,13 +129,16 @@ namespace DVLD_Project.Users
 
         private void OnValidating(object sender, CancelEventArgs e)
         {
-            if (string.IsNullOrWhiteSpace(((TextBox)sender).Text))
+            if (((TextBox)sender).Enabled == true)
             {
-                errorProvider1.SetError((TextBox)sender, "This field is required");
-            }
-            else
-            {
-                errorProvider1.SetError((TextBox)sender, "");
+                if (string.IsNullOrWhiteSpace(((TextBox)sender).Text))
+                {
+                    errorProvider1.SetError((TextBox)sender, "This field is required");
+                }
+                else
+                {
+                    errorProvider1.SetError((TextBox)sender, "");
+                }
             }
         }
 
@@ -184,7 +189,7 @@ namespace DVLD_Project.Users
         private bool HasErrors()
         {
             this.ValidateChildren();
-            foreach (Control ctrl in this.Controls)
+            foreach (Control ctrl in tpUser.Controls)
             {
                 if (!string.IsNullOrEmpty(errorProvider1.GetError(ctrl)))
                     return true;
@@ -201,7 +206,7 @@ namespace DVLD_Project.Users
             }
 
             _user.UserName = tbUserName.Text;
-            _user.Password = tbPassword.Text;
+            _user.Password = clsUtil.ComputeHash(tbPassword.Text);
             _user.IsActive = cbIsActive.Checked;
             _user.Person = clsPerson.GetPerson(ctrlPersonCardWithFilter1.PersonID);
 

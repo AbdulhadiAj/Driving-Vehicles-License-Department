@@ -1,4 +1,5 @@
 ﻿using DVLD_BusinessLoginLayer;
+using DVLD_Project.Global_Classes;
 using DVLD_Project.People.Controls;
 using System;
 using System.Collections.Generic;
@@ -60,7 +61,7 @@ namespace DVLD_Project.Users
                 return;
             }
 
-            if (_user.Password != tbCurrentPassword.Text)
+            if (_user.Password != clsUtil.ComputeHash(tbCurrentPassword.Text))
             {
                 errorProvider1.SetError(tbCurrentPassword, "Wrong Password");
                 return;
@@ -118,7 +119,7 @@ namespace DVLD_Project.Users
                 MessageBox.Show("Some Fields are invalid", "Invalid Fields", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
             }
-            _user.Password = tbNewPassword.Text;
+            _user.Password = clsUtil.ComputeHash(tbNewPassword.Text);
             if (_user.Save())
                 MessageBox.Show("Password Changed Successfully", "Success", MessageBoxButtons.OK, MessageBoxIcon.Information);
             else

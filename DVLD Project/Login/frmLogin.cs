@@ -25,6 +25,7 @@ namespace DVLD_Project.Login
 
         private void btnLogin_Click(object sender, EventArgs e)
         {
+            Clipboard.SetText(clsUtil.ComputeHash(tbPassword.Text));
             if (string.IsNullOrWhiteSpace(tbUsername.Text) || string.IsNullOrWhiteSpace(tbPassword.Text))
             {
                 MessageBox.Show("Some fields are missing", "Missing", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
@@ -37,7 +38,7 @@ namespace DVLD_Project.Login
                 return;
             }
 
-            if (!clsUser.IsPasswordMatch(tbUsername.Text, tbPassword.Text))
+            if (!clsUser.IsPasswordMatch(tbUsername.Text, clsUtil.ComputeHash(tbPassword.Text)))
             {
                 MessageBox.Show("Incorrect Password", "Failed", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 return;
@@ -69,7 +70,7 @@ namespace DVLD_Project.Login
                 clsEventLogger.LogError(ex.Message);
             }    
 
-            User = clsUser.GetUser(tbUsername.Text, tbPassword.Text);
+            User = clsUser.GetUser(tbUsername.Text, clsUtil.ComputeHash(tbPassword.Text));
             this.DialogResult = DialogResult.OK;
             this.Close();
         }
